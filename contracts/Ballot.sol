@@ -20,21 +20,32 @@ contract Ballot {
         // always use one of bytes1 to bytes32 because they are much cheaper
         bytes32 name;   // short name (up to 32 bytes)
         uint voteCount; // number of accumulated votes
+        address addrpo;
     }
 
+    address public owner;
     address public chairperson;
 
     mapping(address => Voter) public voters;
 
     Proposal[] public proposals;
 
+    uint prizeAmount;
+    uint256 public finishAt;
+
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+
     /** 
      * @dev Create a new ballot to choose one of 'proposalNames'.
      * @param proposalNames names of proposals
      */
-    constructor(bytes32[] memory proposalNames) {
+    constructor(bytes32[] memory proposalNames, address proposalAddress) {
         chairperson = msg.sender;
         voters[chairperson].weight = 1;
+        finishAt = block.timestamp + 3 days;
 
         for (uint i = 0; i < proposalNames.length; i++) {
             // 'Proposal({...})' creates a temporary
@@ -42,7 +53,8 @@ contract Ballot {
             // appends it to the end of 'proposals'.
             proposals.push(Proposal({
                 name: proposalNames[i],
-                voteCount: 0
+                voteCount: 0,
+                addrpo: proposalAddress
             }));
         }
     }
@@ -97,10 +109,13 @@ contract Ballot {
      * @dev Give your vote (including votes delegated to you) to proposal 'proposals[proposal].name'.
      * @param proposal index of proposal in the proposals array
      */
-    function vote(uint proposal) public {
+    function vote(uint proposal) public payable{
         Voter storage sender = voters[msg.sender];
+        require(block.timestamp < finishAt, "already finished");
+        require(msg.value == 1e18 / 100);  // 0.01 eth
         require(sender.weight != 0, "Has no right to vote");
         require(!sender.voted, "Already voted.");
+        require(msg.value >= 0.01 ether, "SMALL_ETH");
         sender.voted = true;
         sender.vote = proposal;
 
@@ -108,6 +123,7 @@ contract Ballot {
         // this will throw automatically and revert all
         // changes.
         proposals[proposal].voteCount += sender.weight;
+        prizeAmount += msg.value;
     }
 
     /** 
@@ -131,8 +147,16 @@ contract Ballot {
      * @return winnerName_ the name of the winner
      */
     function winnerName() public view
-            returns (bytes32 winnerName_)
+
+            returns (bytes32 winnerName_, address winnerAddress)
     {
         winnerName_ = proposals[winningProposal()].name;
+        winnerAddress = proposals[winningProposal()].addrpo;
+        payable(winnerAddress).transfer(prizeAmount/100 * 90);
+    }
+
+    function withdrawComissions() public onlyOwner
+    {
+        payable(owner).transfer(prizeAmount/100 * 10);
     }
 }
