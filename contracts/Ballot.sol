@@ -39,7 +39,6 @@ contract Ballot {
     }
 
     /** 
-     * @dev Create a new ballot to choose one of 'proposalNames'.
      * @param proposalNames names of proposals
      */
     constructor(bytes32[] memory proposalNames, address proposalAddress) {
@@ -146,7 +145,7 @@ contract Ballot {
      * @dev Calls winningProposal() function to get the index of the winner contained in the proposals array and then
      * @return winnerName_ the name of the winner
      */
-    function winnerName() public view
+    function winnerName() public
 
             returns (bytes32 winnerName_, address winnerAddress)
     {
