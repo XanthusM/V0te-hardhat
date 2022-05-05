@@ -6,12 +6,12 @@ async function main() {
 
   console.log("Deploying contracts with the account:", deployer.address); 
 
-  const Ballot = await hre.ethers.getContractFactory("Ballot"); // Getting the Contract
-  const ballot = await Ballot.deploy(); //deploying the contract
+  const Votings  = await hre.ethers.getContractFactory("Votings "); // Getting the Contract
+  const votings  = await Votings .deploy(); //deploying the contract
 
-  await ballot.deployed(); // waiting for the contract to be deployed
+  await votings.deployed(); // waiting for the contract to be deployed
 
-  console.log("Ballot deployed to:", ballot.address); // Returning the contract address on the rinkeby
+  console.log("Votings deployed to:", votings.address); // Returning the contract address on the rinkeby
 }
 
 main()
