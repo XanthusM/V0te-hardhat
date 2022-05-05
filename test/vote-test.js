@@ -4,15 +4,15 @@ const assert = require('assert');
 
 
 
-describe("VOte", function () {
+describe("votings", function () {
   let signers;
   let owner;
   let vote;
   let Vote;
 
   beforeEach(async function () {
-      Vote = await ethers.getContractFactory("Vote");
-      vote = await Vote.deploy(prizeAmount);
+      Votings = await ethers.getContractFactory("Votings");
+      votings = await Votings.deploy(prizeAmount);
       await vote.deployed();
       signers = await ethers.getSigners();
       owner = signers[0];
@@ -29,17 +29,3 @@ describe("VOte", function () {
       await addCandidatorTx.wait();
 
     });
-
-
-    //it('ERC721Metadata: URI query for nonexistent token', async () => {
-
-        //try{
-       //await wrapper.tokenURI(1)({
-        //from: signers[0]
-            //});
-            //assert(false);
-        //} catch(err){
-            //assert(err);
-        //}
-      //});
-});
